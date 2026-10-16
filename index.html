@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Parameter</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f6f7f9; color: #222; }
+  h1 { margin-bottom: 4px; }
+  #cari { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; margin: 16px 0; box-sizing: border-box; }
+  .wadah { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #2c3e50; color: #fff; position: sticky; top: 0; }
+  tr:hover td { background: #f0f6ff; }
+  #info { color: #666; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>Data Parameter</h1>
+  <div id="info">Memuat data...</div>
+  <input id="cari" type="text" placeholder="Cari parameter...">
+  <div class="wadah"><table id="tabel"></table></div>
+
+<script>
+  const URL_CSV = "TEMPEL_LINK_CSV_ANDA_DI_SINI";
+  let semuaData = [];
+
+  function tampilkan(data) {
+    const [header, ...isi] = semuaData;
+    let html = "<tr>" + header.map(h => `<th>${h}</th>`).join("") + "</tr>";
+    html += data.map(b => "<tr>" + b.map(s => `<td>${s}</td>`).join("") + "</tr>").join("");
+    document.getElementById("tabel").innerHTML = html;
+    document.getElementById("info").textContent = `Menampilkan ${data.length} dari ${isi.length} baris`;
+  }
+
+  Papa.parse(URL_CSV, {
+    download: true,
+    skipEmptyLines: true,
+    complete: (hasil) => {
+      semuaData = hasil.data;
+      tampilkan(semuaData.slice(1));
+    },
+    error: () => { document.getElementById("info").textContent = "Gagal memuat data. Periksa link CSV."; }
+  });
+
+  document.getElementById("cari").addEventListener("input", (e) => {
+    const kata = e.target.value.toLowerCase();
+    const cocok = semuaData.slice(1).filter(b => b.join(" ").toLowerCase().includes(kata));
+    tampilkan(cocok);
+  });
+</script>
+</body>
+</html>
